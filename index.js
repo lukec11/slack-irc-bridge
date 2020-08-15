@@ -64,8 +64,8 @@ const slackBlocks = (channel, username, message) => {
 };
 
 const sendToSlackAsUser = async (channel, text, username) => {
-	const res = await app.client.chat.postMessage(
-		slackBlocks(channel, username, text)
+	const res = await app.client.chat.postMessage(slackBlocks(
+channel, username, text)
 	);
 	return await res;
 };
