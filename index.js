@@ -39,7 +39,7 @@ const slackBlocks = (channel, username, message) => {
 	return;
 };
 
-const sendToSlackAsUser = async (channel, message, user) => {
+const sendToSlackAsUser = async (channel, text, user) => {
 	//needs separate (xoxp- )SLACK_CLIENT_TOKEN with the "client" scope - this is the only way to send rich_text as a bot - This can be a legacy token or a classic bot token manually imbued with `client` via `developer.apps.scope.update`
 	const res = await fetch(
 		`https://hackclub.slack.com/api/chat.postMessage?token=${process.env.SLACK_CLIENT_TOKEN}&blocks=[\n    {\n      \"type\": \"rich_text\",\n      \"block_id\": \"n2N0\",\n      \"elements\": [\n        {\n          \"type\": \"rich_text_section\",\n          \"elements\": [\n            {\n              \"type\": \"text\",\n              \"text\": \"${message}\"\n            }\n          ]\n        }\n      ]\n    }\n  ]&channel=${channel}&text=<${user}> ${message}&username=${user}&icon_emoji=:speech_balloon:`,
