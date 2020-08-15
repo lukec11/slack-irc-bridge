@@ -38,12 +38,33 @@ const slackBlocks = (channel, username, message) => {
 	return;
 };
 
-const sendToSlackAsUser = async (channel, text, user) => {
-	//needs separate (xoxp- )SLACK_CLIENT_TOKEN with the "client" scope - this is the only way to send rich_text as a bot - This can be a legacy token or a classic bot token manually imbued with `client` via `developer.apps.scope.update`
-	const res = await fetch(
-		`https://hackclub.slack.com/api/chat.postMessage?token=${process.env.SLACK_CLIENT_TOKEN}&blocks=[\n    {\n      \"type\": \"rich_text\",\n      \"block_id\": \"n2N0\",\n      \"elements\": [\n        {\n          \"type\": \"rich_text_section\",\n          \"elements\": [\n            {\n              \"type\": \"text\",\n              \"text\": \"${message}\"\n            }\n          ]\n        }\n      ]\n    }\n  ]&channel=${channel}&text=<${user}> ${message}&username=${user}&icon_emoji=:speech_balloon:`,
-		{ method: "POST" }
-	);
+const sendToSlackAsUser = async (channel, text, username) => {
+	const res = await app.client.chat.postMessage({
+		token: process.env.SLACK_CLIENT_TOKEN, //needs separate (xoxp- )SLACK_CLIENT_TOKEN with the "client" scope - this is the only way to send rich_text as a bot - This can be a legacy token or a classic bot token manually imbued with `client` via `developer.apps.scope.update`
+		channel: channel,
+		username: username,
+		icon_emoji: ":speech_balloon:",
+		//use text for the message to Ripcord
+		text: `<${username}> ${text}`,
+		//use blocks for the message to slack
+		blocks: [
+			{
+				type: "rich_text",
+				block_id: "n2N0",
+				elements: [
+					{
+						type: "rich_text_section",
+						elements: [
+							{
+								type: "text",
+								text: text
+							}
+						]
+					}
+				]
+			}
+		]
+	});
 	return await res;
 };
 
