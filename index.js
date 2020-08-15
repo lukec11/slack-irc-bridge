@@ -45,7 +45,7 @@ const sendToSlackAsUser = async (channel, text, username) => {
 		username: username,
 		icon_emoji: ":speech_balloon:",
 		//use text for the message to Ripcord
-		text: `<${username}> ${message}`,
+		text: `<${username}> ${text}`,
 		//use blocks for the message to slack
 		blocks: [
 			{
@@ -57,7 +57,7 @@ const sendToSlackAsUser = async (channel, text, username) => {
 						elements: [
 							{
 								type: "text",
-								text: "hi"
+								text: text
 							}
 						]
 					}
