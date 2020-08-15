@@ -35,11 +35,7 @@ const getSlackUsername = async uid => {
 };
 
 const slackBlocks = (channel, username, message) => {
-	return;
-};
-
-const sendToSlackAsUser = async (channel, text, username) => {
-	const res = await app.client.chat.postMessage({
+	return {
 		token: process.env.SLACK_BOT_TOKEN,
 		channel: channel,
 		username: username,
@@ -57,14 +53,20 @@ const sendToSlackAsUser = async (channel, text, username) => {
 						elements: [
 							{
 								type: "text",
-								text: "hi"
+								text: message
 							}
 						]
 					}
 				]
 			}
 		]
-	});
+	};
+};
+
+const sendToSlackAsUser = async (channel, text, username) => {
+	const res = await app.client.chat.postMessage(
+		slackBlocks(channel, username, text)
+	);
 	return await res;
 };
 
