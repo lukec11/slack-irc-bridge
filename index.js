@@ -12,7 +12,10 @@ const {
 	IRC_ADDRESS
 } = process.env;
 
+//sleep 5 seconds before starting app
+;(async () => await new Promise(resolve => setTimeout(resolve, 5000)))();
 
+//register irc client
 const client = new irc.Client(IRC_ADDRESS, IRC_USERNAME, {
 	channels: [IRC_BRIDGE_CHANNEL],
 });
