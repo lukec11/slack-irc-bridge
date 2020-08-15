@@ -1,0 +1,16 @@
+{
+  "name": "gotchi-bridge",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@slack/bolt": "^2.2.3",
+    "dotenv": "^8.2.0",
+    "irc": "^0.5.2"
+  }
+}
