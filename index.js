@@ -43,7 +43,7 @@ const sendToSlackAsUser = async (channel, text, username) => {
 }
 
 const sendToIrcAsUser = (channel, text, username) => {
-	client.say(channel, `<${username}>: ${text}`);
+	client.say(channel, `<${username}> ${text}`);
 }
 
 
