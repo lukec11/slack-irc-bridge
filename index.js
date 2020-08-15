@@ -40,7 +40,7 @@ const slackBlocks = (channel, username, message) => {
 
 const sendToSlackAsUser = async (channel, text, username) => {
 	const res = await app.client.chat.postMessage({
-		token: process.env.SLACK_BOT_TOKEN,
+		token: process.env.SLACK_CLIENT_TOKEN, //needs separate (xoxp- )SLACK_CLIENT_TOKEN with the "client" scope - this is the only way to send rich_text as a bot - This can be a legacy token or a classic bot token manually imbued with `client` via `developer.apps.scope.update`
 		channel: channel,
 		username: username,
 		icon_emoji: ":speech_balloon:",
