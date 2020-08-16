@@ -86,7 +86,10 @@ app.message(async ({ event }) => {
 	if (event.hasOwnProperty('attachments')) {
 		let attachments = event.attachments;
 		for (attachment of attachments) {
-			sentMessage += `\n${attachment.pretext}\n${attachment.fallback}\n`	
+			sentMessage += `\n${attachment.pretext}\n${attachment.fallback}\n`
+			if (attachment.hasOwnProperty('title_link')) {
+				sentMessage += `${attachment.title_link}\n`
+			}
 		}
 	}
 
