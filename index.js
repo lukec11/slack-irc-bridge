@@ -80,7 +80,14 @@ app.message(async ({ event }) => {
 		//don't send own messages
 		return;
 	}
-	sendToIrcAsUser(IRC_BRIDGE_CHANNEL, event.text, await getSlackUsername(event.user));
+
+	let sentMessage = event.text;
+
+	if event.hasOwnProperty('attachments') {
+		sentMessage = `${event.text}\n${event.attachments.pretext}\n${event.attachments.fallback}`	
+	}
+
+	sendToIrcAsUser(IRC_BRIDGE_CHANNEL, sentMessage, await getSlackUsername(event.user));
 })
 
 
