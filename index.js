@@ -84,6 +84,7 @@ app.message(async ({ event }) => {
 	let sentMessage = event.text;
 
 	if (event.hasOwnProperty('attachments')) {
+		console.log(JSON.stringify(event));
 		sentMessage = `${event.text}\n${event.attachments.pretext}\n${event.attachments.fallback}`	
 	}
 
