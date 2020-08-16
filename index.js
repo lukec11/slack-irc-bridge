@@ -83,7 +83,7 @@ app.message(async ({ event }) => {
 
 	let sentMessage = event.text;
 
-	if event.hasOwnProperty('attachments') {
+	if (event.hasOwnProperty('attachments')) {
 		sentMessage = `${event.text}\n${event.attachments.pretext}\n${event.attachments.fallback}`	
 	}
 
