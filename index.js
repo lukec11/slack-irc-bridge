@@ -84,11 +84,13 @@ app.message(async ({ event }) => {
 	let sentMessage = event.text;
 
 	if (event.hasOwnProperty('attachments')) {
-		console.log(JSON.stringify(event));
-		sentMessage = `${event.text}\n${event.attachments.pretext}\n${event.attachments.fallback}`	
+		let attachments = event.attachments;
+		for (attachment of attachments) {
+			sentMessage += `\n${attachments.pretext}\n${attachments.fallback}\n`	
+		}
 	}
 
-	sendToIrcAsUser(IRC_BRIDGE_CHANNEL, sentMessage, await getSlackUsername(event.user));
+	 sendToIrcAsUser(IRC_BRIDGE_CHANNEL, sentMessage, await getSlackUsername(event.user));
 })
 
 
