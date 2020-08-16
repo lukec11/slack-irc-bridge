@@ -93,7 +93,7 @@ app.message(async ({ event }) => {
 		}
 	}
 
-	 sendToIrcAsUser(IRC_BRIDGE_CHANNEL, sentMessage, await getSlackUsername(event.user));
+	 sendToIrcAsUser(IRC_BRIDGE_CHANNEL, sentMessage, await getSlackUsername(event.user) || event.bot_profile.name);
 })
 
 
