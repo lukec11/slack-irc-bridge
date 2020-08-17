@@ -94,9 +94,9 @@ app.message(async ({ event }) => {
 		}
 	}
 	//deal with @s in messages
-	await replaceAsync(sentMessage, /<@([A-Z0-9]+?)>/g, async (_, p1) => { return `@${await getSlackUsername(p1)}` })
+	sentMessage = await replaceAsync(sentMessage, /<@([A-Z0-9]+?)>/g, async (match, p1) => { return `@${await getSlackUsername(p1)}` })
 	
-	 sendToIrcAsUser(IRC_BRIDGE_CHANNEL, sentMessage, await getSlackUsername(event.user) || event.bot_profile.name);
+	sendToIrcAsUser(IRC_BRIDGE_CHANNEL, sentMessage, await getSlackUsername(event.user) || event.bot_profile.name);
 })
 
 
