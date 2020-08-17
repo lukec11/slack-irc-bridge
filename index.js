@@ -97,7 +97,7 @@ app.message(async ({ event }) => {
 	sentMessage = await replaceAsync(sentMessage, /<@([A-Z0-9]+?)>/g, async (match, p1) => { return `@${await getSlackUsername(p1)}` })
 
 	//deal with links in messages
-	sentMessage = await replaceAsync(sentMessage, /<(http[s]?)\:\/\/([^>|]*)[|]?([^>]*)>/gi, async (match, p1, p2, p3) => { return `\n${p3}: ${p1}://${p2}\n` });
+	sentMessage = await replaceAsync(sentMessage, /<(http[s]?)\:\/\/([^>|]*)[|]?([^>]*)>/gi, async (match, p1, p2, p3) => { return `${p3}: ${p1}://${p2}\n` });
 	
 	sendToIrcAsUser(IRC_BRIDGE_CHANNEL, sentMessage, await getSlackUsername(event.user) || event.bot_profile.name);
 })
