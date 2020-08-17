@@ -1,6 +1,7 @@
 require('dotenv').config();
 const { App } = require('@slack/bolt');
 const irc = require('irc');
+const replaceAsync = require('string-replace-async');
 
 const {
 	IRC_USERNAME,
@@ -12,8 +13,8 @@ const {
 	IRC_ADDRESS
 } = process.env;
 
-//sleep 5 seconds before starting app
-;(async () => await new Promise(resolve => setTimeout(resolve, 5000)))();
+//sleep 10 seconds before starting app
+;(async () => await new Promise(resolve => setTimeout(resolve, 10000)))();
 
 //register irc client
 const client = new irc.Client(IRC_ADDRESS, IRC_USERNAME, {
@@ -92,7 +93,9 @@ app.message(async ({ event }) => {
 			}
 		}
 	}
-
+	//deal with @s in messages
+	replaceAsync(sentMessage, /<@([A-Z0-9]+?)>/g, async (_, p1) => { return `@${await getSlackUsername(p1)}` })
+	
 	 sendToIrcAsUser(IRC_BRIDGE_CHANNEL, sentMessage, await getSlackUsername(event.user) || event.bot_profile.name);
 })
 
