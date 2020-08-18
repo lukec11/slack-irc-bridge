@@ -63,7 +63,7 @@ client.addListener(
 );
 
 //listens for /me from irc
-client.addListener("action", async (from, text) => {
+client.addListener("action", async (from, _, text) => {
 	if (from === IRC_USERNAME) {
 		//doesn't send own /me (should be impossible, but sure)
 		return;
