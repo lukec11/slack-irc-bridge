@@ -63,13 +63,13 @@ client.addListener(
 );
 
 //listens for /me from irc
-client.addListener("action", async (from, message) => {
+client.addListener("action", async (from, text) => {
 	if (from === IRC_USERNAME) {
 		//doesn't send own /me (should be impossible, but sure)
 		return;
 	}
 	//equivalent to slack's /me - italicized text
-	let responseText = `_${message}_`;
+	let responseText = `_${text}_`;
 
 	await sendToSlackAsUser(SLACK_BRIDGE_CHANNEL, responseText, from);
 });
