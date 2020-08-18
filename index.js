@@ -118,13 +118,9 @@ app.message(async ({ event }) => {
 	);
 
 	//deal with links in messages
-	sentMessage = await replaceAsync(
-		sentMessage,
-		/<(http[s]?)\:\/\/([^>|]*)[|]?([^>]*)>/gi,
-		async (match, p1, p2, p3) => {
-			return `${p3}: ${p1}://${p2}\n`;
-		}
-	);
+	sentMessage = sentMessage.replace(/<(http[s]?)\:\/\/([^>|]*)[|]?([^>]*)>/gi, (_, p1, p2, p3) => {
+		return `${p3}: ${p1}://${p2}\n`;
+	})
 
 	sendToIrcAsUser(
 		IRC_BRIDGE_CHANNEL,
