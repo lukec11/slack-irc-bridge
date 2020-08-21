@@ -139,10 +139,6 @@ app.error(error => {
 	console.error(error);
 });
 
-//cleanly shut down irc connection on SIGTERM
-process.on('SIGTERM', () => {
-	client.disconnect()
-})
 
 (async () => {
 	await app.start(3000);
