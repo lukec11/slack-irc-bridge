@@ -101,7 +101,7 @@ app.message(async ({ event }) => {
 		let attachments = event.attachments;
 		for (attachment of attachments) {
 			sentMessage += `\n${attachment.pretext || ""}\n${
-				attachment.fallback || atachment.text || ""
+				attachment.text || atachment.fallback || ""
 			}\n`;
 			if (attachment.hasOwnProperty("title_link")) {
 				sentMessage += `${attachment.title_link}\n`;
@@ -138,6 +138,11 @@ app.error(error => {
 	//listens for errors on slack bolt
 	console.error(error);
 });
+
+//cleanly shut down irc connection on SIGTERM
+process.on('SIGTERM', () => {
+	client.disconnect()
+})
 
 (async () => {
 	await app.start(3000);
