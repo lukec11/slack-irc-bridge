@@ -97,6 +97,7 @@ app.message(async ({ event }) => {
 
 	let sentMessage = event.text;
 
+	//deal with attachments
 	if (event.hasOwnProperty("attachments")) {
 		let attachments = event.attachments;
 		for (attachment of attachments) {
@@ -119,8 +120,16 @@ app.message(async ({ event }) => {
 
 	//deal with links in messages
 	sentMessage = sentMessage.replace(/<(http[s]?)\:\/\/([^>|]*)[|]?([^>]*)>/gi, (_, p1, p2, p3) => {
-		return `${p3}: ${p1}://${p2}\n`;
-	})
+		return `${p3} (${p1}://${p2})`;
+	});
+
+	//deal with images in messages
+	if (event.hasOwnProperty('files')) {
+		let files = event.files;
+		for (let file of files) {
+			sentMessage += `\nFILE ${file.name || file.title || "" } (${file.url_private || file.url_private_download || "URL not found!"})`
+		}
+	}
 
 	sendToIrcAsUser(
 		IRC_BRIDGE_CHANNEL,
