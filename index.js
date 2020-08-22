@@ -101,7 +101,7 @@ app.message(async ({ event }) => {
 	if (event.hasOwnProperty("attachments")) {
 		let attachments = event.attachments;
 		for (attachment of attachments) {
-			sentMessage += `\n${attachment.pretext || ""}\n${
+			sentMessage += `${(event.text ? "\n" : "")}${attachment.pretext || ""}\n${
 				attachment.text || atachment.fallback || ""
 			}\n`;
 			if (attachment.hasOwnProperty("title_link")) {
@@ -127,7 +127,7 @@ app.message(async ({ event }) => {
 	if (event.hasOwnProperty('files')) {
 		let files = event.files;
 		for (let file of files) {
-			sentMessage += `\nFILE "${file.name || file.title || "" }" (${file.url_private || file.url_private_download || "URL not found!"})`
+			sentMessage += `${(event.text || event.attachments ? "\n" : "")}FILE "${file.name || file.title || "" }" (${file.url_private || file.url_private_download || "URL not found!"})`
 		}
 	}
 
