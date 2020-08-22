@@ -127,7 +127,7 @@ app.message(async ({ event }) => {
 	if (event.hasOwnProperty('files')) {
 		let files = event.files;
 		for (let file of files) {
-			sentMessage += `\nFILE ${file.name || file.title || "" } (${file.url_private || file.url_private_download || "URL not found!"})`
+			sentMessage += `\nFILE "${file.name || file.title || "" }" (${file.url_private || file.url_private_download || "URL not found!"})`
 		}
 	}
 
