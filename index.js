@@ -117,9 +117,14 @@ app.message(async ({ event }) => {
 			return `@${await getSlackUsername(p1)}`;
 		}
 	);
+	
+	//deal with normal links in messages
+	sentMessage = sentMessage.replace(/<(http[s]?\:\/\/[^>|]*)>/gi, (_, p1) => {
+		return p1
+	});
 
-	//deal with links in messages
-	sentMessage = sentMessage.replace(/<(http[s]?)\:\/\/([^>|]*)[|]?([^>]*)>/gi, (_, p1, p2, p3) => {
+	//deal with hyperlinked words in messages
+	sentMessage = sentMessage.replace(/<(http[s]?)\:\/\/([^>|]*)[|]([^>]*)>/gi, (_, p1, p2, p3) => {
 		return `${p3} (${p1}://${p2})`;
 	});
 
