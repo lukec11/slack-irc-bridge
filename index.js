@@ -195,9 +195,9 @@ app.message(async ({ event }) => {
 	if (event.hasOwnProperty("attachments")) {
 		let attachments = event.attachments;
 		for (attachment of attachments) {
-			sentMessage += `${event.text ? "\n" : ""}${
-				attachment.pretext || ""
-			}\n${attachment.text || atachment.fallback || ""}\n`;
+			sentMessage += `${(event.text ? "\n" : "")}${attachment.pretext || ""}\n${
+				attachment.text || attachment.fallback || ""
+			}\n`;
 			if (attachment.hasOwnProperty("title_link")) {
 				sentMessage += `${attachment.title_link}\n`;
 			}
@@ -211,14 +211,16 @@ app.message(async ({ event }) => {
 			return `@${await getSlackUsername(p1)}`;
 		}
 	);
+	
+	//deal with normal links in messages
+	sentMessage = sentMessage.replace(/<(http[s]?\:\/\/[^>|]*)>/gi, (_, p1) => {
+		return p1
+	});
 
-	//deal with links in messages
-	sentMessage = sentMessage.replace(
-		/<(http[s]?)\:\/\/([^>|]*)[|]?([^>]*)>/gi,
-		(_, p1, p2, p3) => {
-			return `${p3} (${p1}://${p2})`;
-		}
-	);
+	//deal with hyperlinked words in messages
+	sentMessage = sentMessage.replace(/<(http[s]?)\:\/\/([^>|]*)[|]([^>]*)>/gi, (_, p1, p2, p3) => {
+		return `${p3} (${p1}://${p2})`;
+	});
 
 	//deal with images in messages
 	if (event.hasOwnProperty("files")) {
