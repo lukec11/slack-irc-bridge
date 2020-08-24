@@ -10,11 +10,13 @@ const {
 	SLACK_BRIDGE_CHANNEL,
 	APP_ID,
 	IRC_CHANNEL_PASSWORD,
-	IRC_ADDRESS
+	IRC_ADDRESS,
+	AIRTABLE_BASE_ID,
+	AIRTABLE_API_KEY
 } = process.env;
 
-//sleep 10 seconds before starting app
-(async () => await new Promise(resolve => setTimeout(resolve, 10000)))();
+//airtable shenanigans
+const base = require("airtable").base(AIRTABLE_BASE_ID);
 
 //register irc client
 const client = new irc.Client(IRC_ADDRESS, IRC_USERNAME, {
@@ -35,13 +37,16 @@ const getSlackUsername = async uid => {
 	return await res.user.profile.display_name_normalized;
 };
 
+//sends to slack with certain username
+const SPEECH_BUBBLE_URL =
+	"https://cdn2.iconfinder.com/data/icons/round-speech-bubbles-outline/64/comment-bubble-outline-03-512.png"; //i'm sorry for the hotlink
 const sendToSlackAsUser = async (channel, text, username) => {
 	const res = await app.client.chat.postMessage({
 		token: process.env.SLACK_BOT_TOKEN,
 		channel: channel,
 		text: text,
 		username: username,
-		icon_emoji: ":speech_balloon:"
+		icon_url: (await getPicUrl(username)) || SPEECH_BUBBLE_URL
 	});
 	return await res;
 };
@@ -50,6 +55,66 @@ const sendToIrcAsUser = (channel, text, username) => {
 	client.say(channel, `<${username}> ${text}`);
 };
 
+//uses airtable to get url of profile picture
+const getPicUrl = async nick => {
+	try {
+		const userRecord = await base("ProfilePic")
+			.select({ filterByFormula: `Nick = "${nick}"` })
+			.all();
+
+		if (userRecord.length > 0) {
+			return userRecord[0].fields.PhotoUrl;
+		}
+		//otherwise return undefined
+		return undefined;
+	} catch (err) {
+		console.error(err);
+	}
+};
+
+const updateExistingPic = async (recordId, url) => {
+	try {
+		await base("ProfilePic").update(recordId, {
+			PhotoUrl: url
+		});
+	} catch (err) {
+		console.error(err);
+	}
+};
+
+const createNewPic = async (nick, url) => {
+	try {
+		await base("ProfilePic").create({
+			Nick: nick,
+			PhotoUrl: url
+		});
+	} catch (err) {
+		console.error(err);
+	}
+};
+
+const setPicUrl = async (nick, url) => {
+	try {
+		//check if record exists already
+		const record = await base("ProfilePic")
+			.select({ filterByFormula: `Nick = "${nick}"` })
+			.all();
+		if (record.length > 0) {
+			//it exists already so update it
+			await updateExistingPic(record[0].id, url);
+		} else {
+			//this means that it doesn't exist yet
+			await createNewPic(nick, url);
+		}
+		//return true if it succeeded
+		return true;
+	} catch (err) {
+		console.error(err);
+		return false;
+	}
+};
+// listeners
+
 //listens for messages from irc
 client.addListener(
 	`message${process.env.IRC_BRIDGE_CHANNEL}`,
@@ -57,6 +122,35 @@ client.addListener(
 		if (from === IRC_USERNAME) {
 			// doesn't send its own messages
 			return;
+		}
+
+		//check if message is a command
+		if (message.startsWith("!")) {
+			if (message.startsWith("!picture")) {
+				try {
+					const photoUrl = message.match(
+						/!picture (http[s]?\:\/\/.+)/i
+					);
+					const isPictureSet = await setPicUrl(from, photoUrl[1]);
+					if (isPictureSet) {
+						client.say(
+							IRC_BRIDGE_CHANNEL,
+							`${from}: Photo registered!`
+						);
+					} else {
+						client.say(
+							IRC_BRIDGE_CHANNEL,
+							`${from}: Sorry, that didn't work. Try again?`
+						);
+					}
+				} catch (err) {
+					console.error(err);
+					client.say(
+						IRC_BRIDGE_CHANNEL,
+						`${from}: That didn't work. Try again?`
+					);
+				}
+			}
 		}
 		await sendToSlackAsUser(SLACK_BRIDGE_CHANNEL, message, from);
 	}
@@ -129,10 +223,16 @@ app.message(async ({ event }) => {
 	});
 
 	//deal with images in messages
-	if (event.hasOwnProperty('files')) {
+	if (event.hasOwnProperty("files")) {
 		let files = event.files;
 		for (let file of files) {
-			sentMessage += `${(event.text || event.attachments ? "\n" : "")}FILE "${file.name || file.title || "" }" (${file.url_private || file.url_private_download || "URL not found!"})`
+			sentMessage += `${
+				event.text || event.attachments ? "\n" : ""
+			}FILE "${file.name || file.title || ""}" (${
+				file.url_private ||
+				file.url_private_download ||
+				"URL not found!"
+			})`;
 		}
 	}
 
@@ -152,7 +252,6 @@ app.error(error => {
 	//listens for errors on slack bolt
 	console.error(error);
 });
-
 
 (async () => {
 	await app.start(3000);
