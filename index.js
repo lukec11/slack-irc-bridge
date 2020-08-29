@@ -116,7 +116,7 @@ const setPicUrl = async (nick, url) => {
 };
 
 const shortenUrl = async url => {
-	if (url.length < 24) {
+	if (url.length < 32) {
 		return url;
 	} //returns regular url unless it's long
 
