@@ -2,6 +2,7 @@ require("dotenv").config();
 const { App } = require("@slack/bolt");
 const irc = require("irc");
 const replaceAsync = require("string-replace-async");
+const fetch = require('node-fetch');
 
 const {
 	IRC_USERNAME,
