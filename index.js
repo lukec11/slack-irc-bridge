@@ -129,7 +129,7 @@ const shortenUrl = async url => {
 
 const getChannelName = async (channelId) => {
 	const res = await app.client.conversations.info({
-		token: SLACK_BOT_TOKEN,
+		token: process.env.SLACK_BOT_TOKEN,
 		channel: channelId
 	})
 
