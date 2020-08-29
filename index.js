@@ -232,7 +232,7 @@ app.message(async ({ event }) => {
 	//deal with channel names in messages
 	sentMessage = await replaceAsync(
 		sentMessage,
-		/\<([CG][A-Z0-9]+)(?:\|[A-z0-9]+)?>/i,
+		/\<(\#[CG][A-Z0-9]+)(?:\|[A-z0-9]+)?>/i,
 		async (match, p1) => {
 			return `#${await getChannelName(p1) || 'UnknownChannel' }`
 		}
