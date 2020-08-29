@@ -116,6 +116,10 @@ const setPicUrl = async (nick, url) => {
 };
 
 const shortenUrl = async url => {
+	if (url.length < 24) {
+		return url;
+	} //returns regular url unless it's long
+
 	let res = await fetch(
 		`https://u.nu/api.php?action=shorturl&format=json&url=${url}`
 	);
