@@ -113,6 +113,14 @@ const setPicUrl = async (nick, url) => {
 		return false;
 	}
 };
+
+const shortenUrl = async url => {
+	let res = await fetch(
+		`https://u.nu/api.php?action=shorturl&format=json&url=${url}`
+	);
+	res = await res.json();
+	return res.shorturl;
+};
 // listeners
 
 //listens for messages from irc
@@ -195,9 +203,12 @@ app.message(async ({ event }) => {
 	if (event.hasOwnProperty("attachments")) {
 		let attachments = event.attachments;
 		for (attachment of attachments) {
-			sentMessage += `${(event.text ? "\n" : "")}${attachment.pretext || ""}\n${
-				attachment.text || attachment.fallback || ""
-			}\n`;
+			sentMessage += attachment.author_name
+				? ` ${attachment.author_name}`
+				: ""; //attach author name if available
+			sentMessage += `${event.text ? "\n" : ""}${
+				attachment.pretext || ""
+			}\n${attachment.text || attachment.fallback || ""} `;
 			if (attachment.hasOwnProperty("title_link")) {
 				sentMessage += `${attachment.title_link}\n`;
 			}
@@ -208,19 +219,23 @@ app.message(async ({ event }) => {
 		sentMessage,
 		/<@([A-Z0-9]+?)>/g,
 		async (match, p1) => {
-			return `@${await getSlackUsername(p1)}`;
+			return `@${await getSlackUsername(p1) || 'UnknownUser'}`;
 		}
 	);
-	
+
 	//deal with normal links in messages
-	sentMessage = sentMessage.replace(/<(http[s]?\:\/\/[^>|]*)>/gi, (_, p1) => {
-		return p1
+	sentMessage = replaceAsync(sentMessage, /<(http[s]?\:\/\/[^>|]*)>/gi, async (_, p1) => {
+		return await shortenUrl(p1);
 	});
 
 	//deal with hyperlinked words in messages
-	sentMessage = sentMessage.replace(/<(http[s]?)\:\/\/([^>|]*)[|]([^>]*)>/gi, (_, p1, p2, p3) => {
-		return `${p3} (${p1}://${p2})`;
-	});
+	sentMessage = replaceAsync(
+		sentMessage,
+		/<(http[s]?)\:\/\/([^>|]*)[|]([^>]*)>/gi,
+		async (_, p1, p2, p3) => {
+			return `${p3} (${p1}://${await shortenUrl(p2)})`;
+		}
+	);
 
 	//deal with images in messages
 	if (event.hasOwnProperty("files")) {
