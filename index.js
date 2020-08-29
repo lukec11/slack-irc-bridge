@@ -126,6 +126,15 @@ const shortenUrl = async url => {
 	res = await res.json();
 	return res.shorturl;
 };
+
+const getChannelName = async (channelId) => {
+	const res = await app.client.conversations.info({
+		token: SLACK_BOT_TOKEN,
+		channel: channelId
+	})
+
+	return res.channel.name
+}
 // listeners
 
 //listens for messages from irc
@@ -219,6 +228,17 @@ app.message(async ({ event }) => {
 			}
 		}
 	}
+
+	//deal with channel names in messages
+	sentMessage = await replaceAsync(
+		sentMessage,
+		/\<([CG][A-Z0-9]+)(?:\|[A-z0-9]+)?>/i,
+		async (match, p1) => {
+			return `#${await getChannelName(p1) || 'UnknownChannel' }`
+		}
+	)
+
+
 	//deal with @s in messages
 	sentMessage = await replaceAsync(
 		sentMessage,
