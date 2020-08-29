@@ -211,7 +211,7 @@ app.message(async ({ event }) => {
 				attachment.pretext || ""
 			}\n${attachment.text || attachment.fallback || ""} `;
 			if (attachment.hasOwnProperty("title_link")) {
-				sentMessage += `${attachment.title_link}\n`;
+				sentMessage += `${await shortenUrl(attachment.title_link)}\n`;
 			}
 		}
 	}
