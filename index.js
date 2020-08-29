@@ -224,12 +224,12 @@ app.message(async ({ event }) => {
 	);
 
 	//deal with normal links in messages
-	sentMessage = replaceAsync(sentMessage, /<(http[s]?\:\/\/[^>|]*)>/gi, async (_, p1) => {
+	sentMessage = await replaceAsync(sentMessage, /<(http[s]?\:\/\/[^>|]*)>/gi, async (_, p1) => {
 		return await shortenUrl(p1);
 	});
 
 	//deal with hyperlinked words in messages
-	sentMessage = replaceAsync(
+	sentMessage = await replaceAsync(
 		sentMessage,
 		/<(http[s]?)\:\/\/([^>|]*)[|]([^>]*)>/gi,
 		async (_, p1, p2, p3) => {
