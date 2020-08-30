@@ -117,23 +117,26 @@ const setPicUrl = async (nick, url) => {
 };
 
 const shortenUrl = async url => {
-	if (url.length < 32) {
-		return url;
-	} //returns regular url unless it's long
+	try {
+		if (url.length < 32) {
+			return url;
+		} //returns regular url unless it's long
 
-	let res = await fetch("https://kutt.it/api/v2/links", {
-		method: "POST",
-		body: JSON.stringify({
-			target: url,
-			reuse: true
-		}),
-		headers: {
-			"content-type": "application/json",
-			"X-API-KEY": KUTT_API_KEY
-		}
-	});
-	res = await res.json();
-	return res.link;
+		let res = await fetch("https://kutt.it/api/v2/links", {
+			method: "POST",
+			body: JSON.stringify({
+				target: url,
+				reuse: true
+			}),
+			headers: {
+				"Content-Type": "application/json",
+				"X-API-KEY": KUTT_API_KEY
+			}
+		});
+		return (await res.json()).link;
+	} catch (err) {
+		console.error(err);
+	}
 };
 
 const getChannelName = async channelId => {
