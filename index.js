@@ -234,7 +234,7 @@ app.message(async ({ event }) => {
 				: ""; //attach author name if available
 			sentMessage += `${event.text ? "\n" : ""}${
 				attachment.pretext || ""
-			}\n${attachment.text || attachment.fallback || ""} `;
+			} ${attachment.text || attachment.fallback || ""} `;
 			if (attachment.hasOwnProperty("title_link")) {
 				sentMessage += `${await shortenUrl(attachment.title_link)}\n`;
 			}
