@@ -273,7 +273,7 @@ app.message(async ({ event }) => {
 		sentMessage,
 		/<(http[s]?)\:\/\/([^>|]*)[|]([^>]*)>/gi,
 		async (_, p1, p2, p3) => {
-			return `${p3} (${p1}://${await shortenUrl(p2)})`;
+			return `${p3} (${await shortenUrl(p2)})`;
 		}
 	);
 
