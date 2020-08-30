@@ -2,7 +2,7 @@ require("dotenv").config();
 const { App } = require("@slack/bolt");
 const irc = require("irc");
 const replaceAsync = require("string-replace-async");
-const fetch = require('node-fetch');
+const fetch = require("node-fetch");
 
 const {
 	IRC_USERNAME,
@@ -13,7 +13,8 @@ const {
 	IRC_CHANNEL_PASSWORD,
 	IRC_ADDRESS,
 	AIRTABLE_BASE_ID,
-	AIRTABLE_API_KEY
+	AIRTABLE_API_KEY,
+	KUTT_API_KEY
 } = process.env;
 
 //airtable shenanigans
@@ -120,21 +121,29 @@ const shortenUrl = async url => {
 		return url;
 	} //returns regular url unless it's long
 
-	let res = await fetch(
-		`https://u.nu/api.php?action=shorturl&format=json&url=${url}`
-	);
+	let res = await fetch("https://kutt.it/api/v2/links", {
+		method: "POST",
+		body: JSON.stringify({
+			target: url,
+			reuse: true
+		}),
+		headers: {
+			"content-type": "application/json",
+			"X-API-KEY": KUTT_API_KEY
+		}
+	});
 	res = await res.json();
-	return res.shorturl;
+	return res.link;
 };
 
-const getChannelName = async (channelId) => {
+const getChannelName = async channelId => {
 	const res = await app.client.conversations.info({
 		token: process.env.SLACK_BOT_TOKEN,
 		channel: channelId
-	})
+	});
 
-	return res.channel.name
-}
+	return res.channel.name;
+};
 // listeners
 
 //listens for messages from irc
@@ -234,24 +243,27 @@ app.message(async ({ event }) => {
 		sentMessage,
 		/\<\#([CG][A-Z0-9]+)(?:\|[A-z0-9]+)?>/i,
 		async (match, p1) => {
-			return `#${await getChannelName(p1) || 'UnknownChannel' }`
+			return `#${(await getChannelName(p1)) || "UnknownChannel"}`;
 		}
-	)
-
+	);
 
 	//deal with @s in messages
 	sentMessage = await replaceAsync(
 		sentMessage,
 		/<@([A-Z0-9]+?)>/g,
 		async (match, p1) => {
-			return `@${await getSlackUsername(p1) || 'UnknownUser'}`;
+			return `@${(await getSlackUsername(p1)) || "UnknownUser"}`;
 		}
 	);
 
 	//deal with normal links in messages
-	sentMessage = await replaceAsync(sentMessage, /<(http[s]?\:\/\/[^>|]*)>/gi, async (_, p1) => {
-		return await shortenUrl(p1);
-	});
+	sentMessage = await replaceAsync(
+		sentMessage,
+		/<(http[s]?\:\/\/[^>|]*)>/gi,
+		async (_, p1) => {
+			return await shortenUrl(p1);
+		}
+	);
 
 	//deal with hyperlinked words in messages
 	sentMessage = await replaceAsync(
